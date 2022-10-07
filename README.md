@@ -12,3 +12,4 @@ A plugin for [Obsidian](https://obsidian.md/) that aggregates a terse stream of 
 * Links should be used as the only organizing principle in the vault - forgo use of tags and files/folders. This helps with completeness; the plugin only considers links when aggregating.
 
 ![arrows](https://user-images.githubusercontent.com/6455628/189475242-aa9522ea-3b6e-42ad-845c-efd71bd099b2.png)
+.
