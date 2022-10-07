@@ -126,8 +126,9 @@ export class ApiAdapter {
             .map(async (inlinkingFile) => {
 
                 // Parse title, and strip innerHTML of enclosing <p>:
-                const titleAsMd = await this.renderMarkdown(inlinkingFile.title)
-                const titleInnerHTML = titleAsMd.innerHTML.slice(3, -4)
+                // Also pad with underscore and slice away, to avoid parsing "2022." as ordered list. 
+                const titleAsMd = await this.renderMarkdown(`_${inlinkingFile.title}`)
+                const titleInnerHTML = titleAsMd.innerHTML.slice(4, -4)
 
                 const extended: ExtendedInlinkingFile = {
                     inlinkingFile: inlinkingFile,
@@ -137,6 +138,20 @@ export class ApiAdapter {
                 return extended
             }))
         return components
+    }
+
+
+    /** comparison fn for filter in function to make contextual summaries,
+     * to find relevant links.
+     */
+    compareLinkName(link: LinkCache, basename: string) {
+        // format link name to be comparable with base names:
+        // strip any block references from the end
+        const linkname = link.link.split("#^")[0]
+        if (linkname.toLowerCase() === basename.toLowerCase()) {
+            return true
+        }
+        return false
     }
 
     

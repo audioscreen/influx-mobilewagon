@@ -2,122 +2,28 @@ import * as React from "react";
 import InfluxFile from './InfluxFile';
 import { ExtendedInlinkingFile } from './apiAdapter';
 import { ObsidianInfluxSettings } from "./main";
-import { createUseStyles } from 'react-jss'
 import { TFile } from "obsidian";
+import { StyleSheetType } from "./createStyleSheet";
+// import { ChakraProvider, Box, Text } from '@chakra-ui/react'
 
 
-interface StyleProps {
-	theme: string;
-	centered: boolean;
-	margin: number;
-	fontSize: number;
-	lineHeight: number;
-	largeFontSize: number;
-	largeLineHeight: number;
-	preview: boolean;
-}
-
-const useStyles = createUseStyles({
-
-	root: {
-		// border: '1px solid pink',
-		fontSize: (props: StyleProps) => `${props.fontSize}px`,
-		lineHeight: props => `${props.lineHeight}px`,
-		padding: '8px',
-		paddingRight: '0',
-		maxWidth: props => !props.preview ? `calc(var(--line-width-adaptive) - var(--folding-offset))` : '',
-		marginLeft: props => !props.preview ? `max(calc(50% + var(--folding-offset) - var(--line-width-adaptive)/ 2),calc(50% + var(--folding-offset) - var(--max-width)/ 2)) !important` : '',
-		display: 'flex',
-		flexDirection: 'column',
-		'& h2': {
-			fontSize: props => `${props.largeFontSize}px`,
-			lineHeight: props => `${props.largeLineHeight}px`,
-		},
-		'& h3': {
-			fontSize: props => `${props.fontSize}px`,
-			lineHeight: props => `${props.lineHeight}px`,
-			textTransform: 'uppercase',
-			letterSpacing: '2px',
-			margin: 0,
-			color: 'lightsteelblue',
-		},
-	},
-
-	openerButton: {
-		marginRight: props => `${props.fontSize}px`,
-		cursor: 'pointer',
-	},
-
-	inlinked: {
-		display: 'flex',
-		marginTop: props => `${props.margin}px`,
-		marginBottom: props => props.centered ? `${props.margin}px` : '',
-		flexDirection: props => props.centered ? 'row' : 'column',
-	},
-
-	inlinkedMetaDiv: props => props.centered ? {
-		width: '160px',
-		minWidth: '160px',
-		display: 'flex',
-		flexDirection: 'column',
-		borderRight: '1px dashed lightsteelblue',
-		paddingRight: '1rem',
-	} : {
-		borderTop: '1px dashed lightsteelblue',
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		// backgroundColor: '#fafafa'
-	},
-
-	inlinkedEntries: {
-		width: '100%',
-		flexGrow: 1,
-		display: 'flex',
-		flexDirection: 'column',
-		paddingLeft: '1rem',
-		'& h2': {
-			marginTop: '9px',
-			marginBottom: '9px',
-
-		}
-	},
-
-	inlinkedEntry: {
-		paddingLeft: '8px',
-		marginLeft: '8px',
-		paddingBottom: props => `${props.lineHeight}px !important`,
-		'& input[type=checkbox]': {
-			width: props => `${props.fontSize}px`,
-			height: props => `${props.fontSize}px`,
-			marginTop: props => `-${props.margin + 2}px`,
-		},
-		'& *': {
-			marginBlockEnd: props => !props.preview ? `-${props.lineHeight}px !important` : '',
-		},
-		'& li:nth-child(1)': {
-			marginBlockStart: props => !props.preview ? `-${props.lineHeight}px !important` : '',
-		},
-		'&> ul': {
-			marginTop: props => `${0}px`,
-		}
-	}
-})
-
-interface InfluxReactComponentProps { influxFile: InfluxFile, rand: number, preview: boolean }
+interface InfluxReactComponentProps { influxFile: InfluxFile, rand: number, preview: boolean, sheet: StyleSheetType }
 
 export default function InfluxReactComponent(props: InfluxReactComponentProps): JSX.Element {
 
 	const {
 		influxFile,
 		preview,
+		sheet,
 		// rand,
 	} = props
 
 	const [components, setComponents] = React.useState(influxFile.components)
+	const [stylesheet, setStyleSheet] = React.useState(sheet)
 
-	const callback: (op: string, file: TFile) => void = async (op, file) => {
+	const callback: (op: string, file: TFile, stylesheet: StyleSheetType) => void = async (op, file, stylesheet) => {
 		// TODO: Add change diff for file vs this file. (Is file part of inlinked? Or referenced in inlinked?)
+		setStyleSheet(stylesheet)
 		await influxFile.makeInfluxList()
 		setComponents(await influxFile.renderAllMarkdownBlocks())
 	}
@@ -132,30 +38,17 @@ export default function InfluxReactComponent(props: InfluxReactComponentProps): 
 		}
 	}, [])
 
+	const classes = stylesheet.classes
 
 	const length = influxFile?.inlinkingFiles.length || 0
 	const shownLength = influxFile?.components.length || 0
 
 	const settings: Partial<ObsidianInfluxSettings> = influxFile.api.getSettings()
 
-	const sizing = settings.fontSize || 13
 	const centered = settings.variant !== 'ROWS'
 
-	const styleProps: StyleProps = {
-		theme: '',
-		centered: centered,
-		margin: sizing,
-		fontSize: sizing,
-		lineHeight: sizing + sizing / 2,
-		largeFontSize: sizing, // sizing + 2,
-		largeLineHeight: sizing + sizing / 2, // sizing + 4,
-		preview: props.preview,
-
-	}
 
 	const [isOpen, setIsOpen] = React.useState(!influxFile.collapsed)
-
-	const classes = useStyles(styleProps)
 
 	const hiddenLength = isOpen ? length - shownLength : length
 
@@ -226,7 +119,10 @@ export default function InfluxReactComponent(props: InfluxReactComponentProps): 
 				</div>
 			)
 		})}
+
+		<style
+			dangerouslySetInnerHTML={{ __html: stylesheet.toString() }}
+		/>
+
 	</div>
-
-
 }

@@ -4,7 +4,6 @@ import InfluxReactComponent from '../InfluxReactComponent';
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 
-
 try {
     customElements.define("influx-element", class extends HTMLElement {
         disconnectedCallback() {
@@ -37,7 +36,7 @@ export class InfluxWidget extends WidgetType {
          * Changes to other documents that are referenced in the influx of host file are not caught.
          * Therefore: Bypass this eq-check.
         */
-       return true
+        return true
         // return influxWidget.influxFile?.file?.path === this.influxFile?.file?.path
     }
 
@@ -49,12 +48,14 @@ export class InfluxWidget extends WidgetType {
         const reactAnchor = container.appendChild(document.createElement('div'))
         const anchor = createRoot(reactAnchor)
         const rand = Math.random()
-        anchor.render(<InfluxReactComponent 
-            key={rand} 
-            rand={rand} 
+        anchor.render(<InfluxReactComponent
+            key={rand}
+            rand={rand}
             influxFile={this.influxFile}
             preview={false}
-            />);
+            sheet={this.influxFile.influx.stylesheet}
+        />);
+
         return container
     }
 
