@@ -4,6 +4,8 @@
 
 A plugin for [Obsidian](https://obsidian.md/) that aggregates a terse stream of backlinked clippings in the footer of notes.
 
+# Mobile
+
 ### Intended usage pattern: 
 (Or: How to get the most out of this plugin.)
 

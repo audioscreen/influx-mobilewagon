@@ -1,10 +1,10 @@
 {
 	"id": "influx",
 	"name": "Influx",
-	"version": "1.2.1",
+	"version": "test-002",
 	"minAppVersion": "0.15.0",
 	"description": "A bullet journaling plugin that aggregates a terse stream of backlinked clippings in the footer of notes.",
 	"author": "Jens M Gleditsch",
 	"authorUrl": "https://github.com/jensmtg",
-	"isDesktopOnly": true
+	"isDesktopOnly": false
 }
